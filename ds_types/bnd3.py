@@ -14,10 +14,32 @@ class PackedFile:
         self.file_id = file_id
         self.name_offset = name_offset
 
+        self._name = ''
+
+    def get_name(self):
+        return self._name
+
+    def set_name(self, name):
+        self._name = name
+
 
 class BND3(BinaryFile):
 
     TYPE = b'BND3'
+
+    @staticmethod
+    def write(packed_file: PackedFile, data):
+        path, file_name = os.path.split(packed_file.get_name())
+        path = os.path.splitdrive(path)[1][1:]
+        file_name = os.path.join(path, file_name)
+
+        try:
+            os.makedirs(path)
+        except OSError as e:
+            print(e)
+
+        with open(file_name, 'wb') as writer:
+            writer.write(data)
 
     def __init__(self, file):
         super(BND3, self).__init__(file)
@@ -61,15 +83,17 @@ class BND3(BinaryFile):
         self.file.seek(0, os.SEEK_SET)  # Set the read head to the begging of the file
 
         for packed_file in self.packedFiles:
-            self.file.seek(packed_file.name_offset)  # Set the read head at the begging of the packed file name offset
-            print(self.read_string())
-
+            self.file.seek(packed_file.name_offset)  # Set the read head to the begging of the packed file name offset
+            packed_file.set_name(self.read_string())
 
     def has_next(self):
-        pass  # todo
+        if len(self.packedFiles) > 0:
+            return True
+        return False
 
     def next(self):
-        pass  # todo
+        packed_file = self.packedFiles.pop(0)
+        self.file.seek(packed_file.data_offset)  # Set the read head to data offset
+        data = self.file.read(packed_file.size)
 
-    def read_file(self):
-        pass  # todo
+        return packed_file, data
