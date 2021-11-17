@@ -58,10 +58,12 @@ class BND3(BinaryFile):
             self.packedFiles.append(packed_file)
 
     def _read_packed_file_name(self):
-        self.file.seek(0, os.SEEK_SET) # Set the read head to the begging of the file
+        self.file.seek(0, os.SEEK_SET)  # Set the read head to the begging of the file
 
         for packed_file in self.packedFiles:
-            print(packed_file.file_id)
+            self.file.seek(packed_file.name_offset)  # Set the read head at the begging of the packed file name offset
+            print(self.read_string())
+
 
     def has_next(self):
         pass  # todo
