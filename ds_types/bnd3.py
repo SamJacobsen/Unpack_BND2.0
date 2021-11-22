@@ -1,4 +1,3 @@
-import io
 import os
 import struct
 
@@ -33,10 +32,7 @@ class BND3(BinaryFile):
         path = os.path.splitdrive(path)[1][1:]
         file_name = os.path.join(path, file_name)
 
-        try:
-            os.makedirs(path)
-        except OSError as e:
-            print(e)
+        os.makedirs(path)
 
         with open(file_name, 'wb') as writer:
             writer.write(data)
