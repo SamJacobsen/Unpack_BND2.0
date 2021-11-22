@@ -24,18 +24,7 @@ class PackedFile:
 
 class BND3(BinaryFile):
 
-    TYPE = b'BND3'
-
-    @staticmethod
-    def write(packed_file: PackedFile, data):
-        path, file_name = os.path.split(packed_file.get_name())
-        path = os.path.splitdrive(path)[1][1:]
-        file_name = os.path.join(path, file_name)
-
-        os.makedirs(path)
-
-        with open(file_name, 'wb') as writer:
-            writer.write(data)
+    HEADER = b'BND3'
 
     def __init__(self, file):
         super(BND3, self).__init__(file)
@@ -44,7 +33,7 @@ class BND3(BinaryFile):
 
         magic = self.file.read(4)
 
-        if magic == BND3.TYPE:
+        if magic == BND3.HEADER:
             version = self.file.read(8)
             format = self.file.read(4).hex()
 
@@ -87,9 +76,9 @@ class BND3(BinaryFile):
             return True
         return False
 
-    def next(self):
+    def next(self) -> (str, bytes):
         packed_file = self.packedFiles.pop(0)
         self.file.seek(packed_file.data_offset)  # Set the read head to data offset
         data = self.file.read(packed_file.size)
 
-        return packed_file, data
+        return packed_file.get_name(), data
