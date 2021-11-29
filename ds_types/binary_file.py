@@ -19,11 +19,12 @@ class BinaryFile(ABC):
     @staticmethod
     def write(full_path: str, data) -> None:
         path, file_name = os.path.split(full_path)
-        path = os.path.splitdrive(path)[1][1:]
-        file_name = os.path.join(path, file_name)
+        if path:
+            path = os.path.splitdrive(path)[1][1:]
+            file_name = os.path.join(path, file_name)
 
-        if not os.path.exists(path):
-            os.makedirs(path)
+            if not os.path.exists(path):
+                os.makedirs(path)
 
         with open(file_name, 'wb') as writer:
             writer.write(data)
